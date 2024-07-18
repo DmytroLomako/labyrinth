@@ -12,11 +12,12 @@ class Hero:
         self.SPEED = speed
         self.image = None
         self.load_image()
-    def load_image(self):
+    def load_image(self, flip_y = False):
         path_folder = os.path.abspath(__file__ + '/..')
         path_image = os.path.join(path_folder, self.IMAGE_NAME)
         self.image = pygame.image.load(path_image)
         self.image = pygame.transform.scale(self.image, (self.WIDTH, self.HEIGHT))
+        self.image = pygame.transform.flip(self.image, False, flip_y)
     def move(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -28,6 +29,8 @@ class Hero:
         elif keys[pygame.K_UP]:
             self.Y -= self.SPEED
             self.collision()
+            if self.Y < 0:
+                self.Y = 0
         elif keys[pygame.K_DOWN]:
             self.Y += self.SPEED
             self.collision()
@@ -54,8 +57,10 @@ class Bullet(Hero):
         self.collision_bullet()
         if self.DIRECTION == 'up':
             self.Y -= self.SPEED
+            self.load_image()
         elif self.DIRECTION == 'down':
             self.Y += self.SPEED
+            self.load_image(True)
     def collision_bullet(self):
         bullet_rect = pygame.Rect(self.X, self.Y, self.WIDTH, self.HEIGHT)
         hero_rect = pygame.Rect(hero.X, hero.Y, hero.WIDTH, hero.HEIGHT)
@@ -80,11 +85,11 @@ game_matrix = [
     [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1],
     [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 'd', 0, 1, 0, 0, 1, 0, 1, 0, 1],
     [1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2],
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'u', 0, 0, 1, 0, 1, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
     [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -105,6 +110,9 @@ for i in game_matrix:
             finish = pygame.Rect(x, y, 30, 30)
         elif j == 'u':
             bullet = Bullet('bullet.png', x + 13, y + 9, 4, 20, 4, 'up')
+            list_bullet.append(bullet)
+        elif j == 'd':
+            bullet = Bullet('bullet.png', x + 13, y - 4, 4, 20, 4, 'down')
             list_bullet.append(bullet)
         x += 30
     y += 30
